@@ -1,9 +1,10 @@
 const pool=require("../database/database")
-
+const { v4: uuidv4 } = require("uuid");
 exports.addExpense =async (req, res) => {
   const user_id=req.user
     let conn
-    const {exp_id,date,amount,expense,curr_id}=req.body
+    const {date,amount,expense,curr_id}=req.body
+    const exp_id=uuidv4()
 try {
   conn=await pool.getConnection()
   let sql=`INSERT INTO expenses (exp_id, user_id, date, amount, expense, curr_id, isActive) VALUES (?,?,?,?,?,?,?)`
