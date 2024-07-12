@@ -1,6 +1,6 @@
 const Sequelize = require("sequelize");
 const sequelize = new Sequelize(
- 'expensetracker',
+ 'test',
  'root',
  'root',
   {
@@ -15,3 +15,4 @@ sequelize.authenticate().then(() => {
 }).catch((error) => {
    console.error('Unable to connect to the database: ', error);
 });
+module.exports=sequelize

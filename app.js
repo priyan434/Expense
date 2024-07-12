@@ -3,8 +3,10 @@ const app = express()
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const routers = require('./Routers/Router')
+var cors = require('cors')
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cors())
 app.use('/', routers)
 app.get('/', (req, res) => {
   res.send('Hello World!')
@@ -30,10 +32,10 @@ const swaggerOptions = {
     components: {
       securitySchemes: {
         xAuthToken: {
-          type: 'authKey',
+          type: 'apiKey',
           in: 'header',
           name: 'x-auth-token',
-          description: 'Custom header for auth',
+          description: 'Custom header for JWT',
         },
       },
     },
@@ -65,7 +67,6 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
  *               - email
  *               - password
  *               - basecurrency
- *               - profile_url
  *             properties:
  *               username:
  *                 type: string
@@ -77,8 +78,10 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
  *                 format: password
  *               basecurrency:
  *                 type: number
- *                profile_url:
- *                 type:string
+ *               profile_url:
+ *                 type: string
+ *                 format: uri
+ *                 description: URL to the user's profile picture
  *     responses:
  *       200:
  *         description: User registered successfully
@@ -118,7 +121,60 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
  *       500:
  *         description: Server error
  */
-
+/**
+ * @swagger
+ * /fetchUserDetails/{id}:
+ *   get:
+ *     summary: Fetch user details by id
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: number
+ *         required: true
+ *         description: user ID
+ *     responses:
+ *       200:
+ *         description: User details fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user_id:
+ *                   type: string
+ *                 username:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                   format: email
+ *                 basecurrency:
+ *                   type: number
+ *                 profile_url:
+ *                   type: string
+ *                   format: uri
+ *       400:
+ *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid credentials
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
 /**
  * @swagger
  * /addExpense:
@@ -149,7 +205,7 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
  *               expense:
  *                 type: string
  *                 example: "Lunch"
- *               curr_id:
+ *               currency_id:
  *                 type: integer
  *                 example: 1
  *     responses:
@@ -190,7 +246,7 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
  *                     type: number
  *                   expense:
  *                     type: string
- *                   curr_id:
+ *                   currency_id:
  *                     type: number
  *       400:
  *         description: User not found or expenses not found
@@ -224,7 +280,7 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
  *       - in: path
  *         name: id
  *         schema:
- *           type: string
+ *           type: number
  *         required: true
  *         description: Expense ID
  *     requestBody:
@@ -241,7 +297,7 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
  *                 type: number
  *               expense:
  *                 type: string
- *               curr_id:
+ *               currency_id:
  *                 type: number
  *     responses:
  *       200:
@@ -281,7 +337,7 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
  *       - in: path
  *         name: id
  *         schema:
- *           type: string
+ *           type: number
  *         required: true
  *         description: Expense ID
  *     responses:
@@ -308,7 +364,7 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
  *                   type: string
  */
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 module.exports = app
